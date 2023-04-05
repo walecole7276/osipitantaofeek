@@ -1,0 +1,55 @@
+AWSTemplateFormatVersion: 2010-09-09
+Resources:
+  CloudWatchAlarmCPUUtilization:
+    Type: "AWS::CloudWatch::Alarm"
+    Properties:
+      AlarmName: !Sub "${AWS::StackName}-CPU_UTILIZATION"
+      AlarmDescription: "Average CPUUtilization Alarm"
+      ActionsEnabled: true
+      MetricName: "CPUUtilization"
+      Namespace: "AWS/Redshift"
+      Statistic: "Average"
+      Dimensions: 
+        - Name: "ClusterIdentifier"
+          Value: !ImportValue RedshiftClusterIdentifier
+      Period: 60
+      EvaluationPeriods: 2
+      Threshold: 80
+      ComparisonOperator: "GreaterThanThreshold"
+      Unit: Percent 
+
+  CloudWatchAlarmHealthStatus:
+    Type: "AWS::CloudWatch::Alarm"
+    Properties:
+      AlarmName: !Sub "${AWS::StackName}-Health_Status"
+      AlarmDescription: "Average HealthStatus Alarm"
+      ActionsEnabled: true
+      MetricName: "HealthStatus"
+      Namespace: "AWS/Redshift"
+      Statistic: "Average"
+      Dimensions: 
+        - Name: "ClusterIdentifier"
+          Value: !ImportValue RedshiftClusterIdentifier
+      Period: 60
+      EvaluationPeriods: 2
+      Threshold: 80
+      ComparisonOperator: "GreaterThanThreshold"
+
+
+  CloudWatchAlarmPercentageDiskSpaceUsed:
+    Type: "AWS::CloudWatch::Alarm"
+    Properties:
+      AlarmName:  !Sub "${AWS::StackName}-Percentage_Disk_SpaceUsed"
+      AlarmDescription: "Average PercentageDiskSpaceUsed Alarm"
+      ActionsEnabled: true
+      MetricName: "PercentageDiskSpaceUsed"
+      Namespace: "AWS/Redshift"
+      Statistic: "Average"
+      Dimensions: 
+        - Name: "ClusterIdentifier"
+          Value: !ImportValue RedshiftClusterIdentifier
+      Period: 60
+      EvaluationPeriods: 2
+      Threshold: 80
+      ComparisonOperator: "GreaterThanThreshold"
+      Unit: Percent 
