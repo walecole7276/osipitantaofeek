@@ -5,6 +5,7 @@ pipeline {
             steps {
                 sh '''
                 echo "Hello World!!"
+                aws s3 ls
                 '''
             }
         }
