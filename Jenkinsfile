@@ -6,7 +6,7 @@ pipeline {
                 sh '''
                 echo "Hello World!!"
                 aws s3api create-bucket \
-                    --bucket newmy-bucket5678 \
+                    --bucket newmy-bucket56 \
                     --region us-east-1
                 '''
             }
