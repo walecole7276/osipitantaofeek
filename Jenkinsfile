@@ -5,7 +5,7 @@ pipeline {
             steps {
                 sh '''
                 echo "Hello World!!"
-                aws cloudformation list-stacks
+                aws s3api delete-bucket --bucket newmy-bucket56 --region us-east-1
                 '''
             }
         }
