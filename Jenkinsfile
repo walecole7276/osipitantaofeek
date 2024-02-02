@@ -5,7 +5,7 @@ pipeline {
             steps {
                 sh '''
                 echo "Hello World!!"
-                aws s3api delete-bucket --bucket newmy-bucket56 --region us-east-1
+                aws cloudformation create-stack --statck-name testter --template-body file://Animals4Life.yml --region us-east-1
                 '''
             }
         }
