@@ -16,13 +16,13 @@ pipeline {
                     secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
                 ]]) {
                     script {
-                        echo "Creating S3 bucket: ${BUCKET_NAME} in region ${AWS_REGION}"
+                        echo "Deleting S3 bucket: ${BUCKET_NAME} in region ${AWS_REGION}"
                         sh """
-                            aws s3api create-bucket \
+                            aws s3api delete-bucket \
                                 --bucket ${BUCKET_NAME} \
                                 --region ${AWS_REGION} \
                         """
-                        echo "S3 bucket ${BUCKET_NAME} created successfully."
+                        echo "S3 bucket ${BUCKET_NAME} deleted successfully."
                     }
                 }
             }
