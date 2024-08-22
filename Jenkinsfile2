@@ -1,0 +1,67 @@
+pipeline {
+    agent any
+
+    environment {
+        AWS_REGION = 'us-east-1'
+        BUCKET_NAME = 'yu60986namemy-unique-s3-bucket'
+        BUILD_ID = ${env.BUILD_ID.split('/')[-1]}"
+    }
+
+    stages {
+        stage('Deploy S3 Bucket') {
+            steps {
+                withCredentials([[
+                    $class: 'AmazonWebServicesCredentialsBinding', 
+                    credentialsId: 'MyAwsCred', // Use the ID from the previous step
+                    accessKeyVariable: 'AWS_ACCESS_KEY_ID',
+                    secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
+                ]]) {
+                    script {
+                        echo "Creating S3 bucket: ${BUCKET_NAME} in region ${AWS_REGION}"
+                        sh """
+                            aws s3api create-bucket \
+                                --bucket ${BUCKET_NAME} \
+                                --region ${AWS_REGION} \
+                                --create-bucket-configuration LocationConstraint=${AWS_REGION}
+                        """
+                        echo "S3 bucket ${BUCKET_NAME} created successfully."
+                    }
+                }
+            }
+        }
+    }
+    stage('Checkstyle Analysis') {
+        steps {
+            sh 'mvn checkstyle:checkstyle'
+        }
+    }
+    stage('Sonar Analysis') {
+        environment {
+            scannerHome = tool 'sonar4.7'
+            SONAR_SCANNER_OPTS = '--add-opens java.base/java.lang=ALL-UNNAMED'
+        }
+        steps {
+            withSonarQubeEnv('sonar') {
+                sh '''${scannerHome}/bin/sonar-scanner \
+                -Dsonar.projectKey=vprofile \
+                -Dsonar.projectName=vprofile \
+                -Dsonar.projectVersion=1.0 \
+                -Dsonar.sources=src/ \
+                -Dsonar.java.binaries=target/test-classes/com/visualpathit/account/controllerTest/ \
+                -Dsonar.junit.reportsPaths=target/surefire-reports/ \
+                -Dsonar.jacoco.reportPaths=target/jacoco.exec \
+                -Dsonar.java.checkstyle.reportPaths=target/checkstyle-result.xml \
+                -X'''
+            }
+        }
+    }    
+
+    post {
+        success {
+            echo "Pipeline completed successfully."
+        }
+        failure {
+            echo "Pipeline failed."
+        }
+    }
+}
