@@ -21,7 +21,6 @@ pipeline {
                             aws s3api create-bucket \
                                 --bucket ${BUCKET_NAME} \
                                 --region ${AWS_REGION} \
-                                --create-bucket-configuration LocationConstraint=${AWS_REGION}
                         """
                         echo "S3 bucket ${BUCKET_NAME} created successfully."
                     }
