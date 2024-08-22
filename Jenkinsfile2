@@ -3,8 +3,7 @@ pipeline {
 
     environment {
         AWS_REGION = 'us-east-1'
-        BUCKET_NAME = 'yu60986namemy-unique-s3-bucket'
-        BUILD_ID = ${env.BUILD_ID.split('/')[-1]}"
+        BUCKET_NAME = 'my-unique-s3-bucket-yu6546name'
     }
 
     stages {
@@ -12,7 +11,7 @@ pipeline {
             steps {
                 withCredentials([[
                     $class: 'AmazonWebServicesCredentialsBinding', 
-                    credentialsId: 'MyAwsCred', // Use the ID from the previous step
+                    credentialsId: 'MyAwsCred', 
                     accessKeyVariable: 'AWS_ACCESS_KEY_ID',
                     secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
                 ]]) {
@@ -29,32 +28,36 @@ pipeline {
                 }
             }
         }
-    }
-    stage('Checkstyle Analysis') {
-        steps {
-            sh 'mvn checkstyle:checkstyle'
-        }
-    }
-    stage('Sonar Analysis') {
-        environment {
-            scannerHome = tool 'sonar4.7'
-            SONAR_SCANNER_OPTS = '--add-opens java.base/java.lang=ALL-UNNAMED'
-        }
-        steps {
-            withSonarQubeEnv('sonar') {
-                sh '''${scannerHome}/bin/sonar-scanner \
-                -Dsonar.projectKey=vprofile \
-                -Dsonar.projectName=vprofile \
-                -Dsonar.projectVersion=1.0 \
-                -Dsonar.sources=src/ \
-                -Dsonar.java.binaries=target/test-classes/com/visualpathit/account/controllerTest/ \
-                -Dsonar.junit.reportsPaths=target/surefire-reports/ \
-                -Dsonar.jacoco.reportPaths=target/jacoco.exec \
-                -Dsonar.java.checkstyle.reportPaths=target/checkstyle-result.xml \
-                -X'''
+
+        stage('Checkstyle Analysis') {
+            steps {
+                sh 'mvn checkstyle:checkstyle'
             }
         }
-    }    
+
+        stage('Sonar Analysis') {
+            environment {
+                scannerHome = tool 'sonar4.7'
+                SONAR_SCANNER_OPTS = '--add-opens java.base/java.lang=ALL-UNNAMED'
+            }
+            steps {
+                withSonarQubeEnv('sonar') {
+                    sh """
+                    ${scannerHome}/bin/sonar-scanner \
+                    -Dsonar.projectKey=vprofile \
+                    -Dsonar.projectName=vprofile \
+                    -Dsonar.projectVersion=1.0 \
+                    -Dsonar.sources=src/ \
+                    -Dsonar.java.binaries=target/test-classes/com/visualpathit/account/controllerTest/ \
+                    -Dsonar.junit.reportsPaths=target/surefire-reports/ \
+                    -Dsonar.jacoco.reportPaths=target/jacoco.exec \
+                    -Dsonar.java.checkstyle.reportPaths=target/checkstyle-result.xml \
+                    -X
+                    """
+                }
+            }
+        }    
+    }
 
     post {
         success {
